@@ -38,7 +38,7 @@ const scrapeData = async url => {
   let day = updated_at.split('-')[0].split(' ')[2];
   let [hour, minut] = parsedDate[0].split(' ')[1].split('H');
 
-  let date = new Date(year, month, day, hour, minut, minut);
+  let date = Date(year, month, day, hour, minut, minut);
 
   const data = await page.evaluate(() => {
     const selector =
