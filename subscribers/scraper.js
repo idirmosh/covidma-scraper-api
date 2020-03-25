@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const moment = require('moment');
 const { xPaths } = require('../lib/config');
 const db = require('./dbupdater');
 
@@ -31,6 +32,13 @@ const scrapeData = async url => {
   );
 
   let updated_at = await page.evaluate(date => date.textContent, dateXPath[0]);
+  let parsedDate = updated_at.split('-');
+  let year = updated_at.split('-')[2];
+  let month = updated_at.split('-')[1];
+  let day = updated_at.split('-')[0].split(' ')[2];
+  let [hour, minut] = parsedDate[0].split(' ')[1].split('H');
+
+  let date = new Date(year, month, day, hour, minut, minut);
 
   const data = await page.evaluate(() => {
     const selector =
@@ -43,7 +51,6 @@ const scrapeData = async url => {
         region: tdCleaned[0],
         cases: tdCleaned[1]
       };
-      console.log(regionalData);
       return regionalData;
     });
   });
@@ -54,7 +61,7 @@ const scrapeData = async url => {
       recovered: parseInt(recovered),
       deaths: parseInt(deaths),
       negative: parseInt(negative),
-      updated_at
+      updated_at: date
     },
     [...data]
   ];

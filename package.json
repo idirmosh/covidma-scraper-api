@@ -8,28 +8,13 @@
     "dev": "nodemon index.js"
   },
   "dependencies": {
-    "assert": "^2.0.0",
-    "axios": "^0.19.2",
-    "cheerio": "^1.0.0-rc.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "floyd-steinberg": "^1.0.6",
-    "generate-schema": "^2.6.0",
-    "jimp": "^0.9.6",
     "moment": "^2.24.0",
-    "mongodb": "^3.5.5",
+    "moment-timezone": "^0.5.28",
     "mongoose": "^5.9.5",
-    "mongoose-gen": "^2.1.1",
     "node-cron": "^2.0.3",
-    "node-tesseract-ocr": "^1.0.0",
-    "pngjs": "^3.4.0",
-    "puppeteer": "^2.1.1",
-    "request": "^2.88.2",
-    "sharp": "^0.25.2",
-    "tesseract.js": "^2.0.0-beta.2",
-    "tesseract.js-node": "^0.1.0",
-    "tesseract.ts": "^1.1.2",
-    "textract": "^2.5.0"
+    "puppeteer": "^2.1.1"
   }
 }

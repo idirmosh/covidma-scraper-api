@@ -7,7 +7,7 @@ let CovidSchema = new Schema({
     recovered: Number,
     deaths: Number,
     negative: Number,
-    updated_at: String
+    updated_at: Date
   },
   '1': {
     type: ['Mixed']

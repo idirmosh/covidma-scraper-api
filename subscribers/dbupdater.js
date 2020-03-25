@@ -7,7 +7,7 @@ const db = async (id, data) => {
   //   if (err) return console.error(err);
   //   console.log(data + ' saved to bookstore collection.');
   // });
-
+  console.log(newData[0]);
   Covid.findOneAndUpdate(
     { _id: id },
     {
