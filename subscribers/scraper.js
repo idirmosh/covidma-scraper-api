@@ -1,5 +1,4 @@
 const puppeteer = require('puppeteer');
-const moment = require('moment');
 const { xPaths } = require('../lib/config');
 const db = require('./dbupdater');
 
@@ -37,9 +36,7 @@ const scrapeData = async url => {
   let month = updated_at.split('-')[1];
   let day = updated_at.split('-')[0].split(' ')[2];
   let [hour, minut] = parsedDate[0].split(' ')[1].split('H');
-
   let date = Date(year, month, day, hour, minut, minut);
-
   const data = await page.evaluate(() => {
     const selector =
       '#WebPartWPQ2 > div.ms-rtestate-field > table > tbody:nth-child(1) > tr';
