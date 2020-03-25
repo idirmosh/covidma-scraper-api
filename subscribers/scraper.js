@@ -1,70 +1,46 @@
-const puppeteer = require('puppeteer');
-const { xPaths } = require('../lib/config');
-const db = require('./dbupdater');
+const jsdom = require('jsdom');
+const got = require('got');
+const { JSDOM } = jsdom;
+const { coordinates, xPaths } = require('../lib/config');
+const { parsDate, merge } = require('../lib/helpers');
+const client = require('./redis');
 
 const scrapeData = async url => {
-  const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
-  const page = await browser.newPage();
-  await page.goto(url);
-
-  const activeCasesXPath = await page.$x(xPaths.active);
-  const recoveredXPath = await page.$x(xPaths.recovered);
-  const deathsXPath = await page.$x(xPaths.deaths);
-  const closedCasesXPath = await page.$x(xPaths.closed);
-  const dateXPath = await page.$x(xPaths.date);
-
-  let confirmed = await page.evaluate(
-    active => active.textContent,
-    activeCasesXPath[0]
-  );
-  let recovered = await page.evaluate(
-    recovered => recovered.textContent,
-    recoveredXPath[0]
-  );
-  let deaths = await page.evaluate(
-    deaths => deaths.textContent,
-    deathsXPath[0]
-  );
-  let negative = await page.evaluate(
-    closed => closed.textContent,
-    closedCasesXPath[0]
-  );
-
-  let updated_at = await page.evaluate(date => date.textContent, dateXPath[0]);
-  let parsedDate = updated_at.split('-');
-  let year = updated_at.split('-')[2];
-  let month = updated_at.split('-')[1];
-  let day = updated_at.split('-')[0].split(' ')[2];
-  let [hour, minut] = parsedDate[0].split(' ')[1].split('H');
-  let date = Date(year, month, day, hour, minut, minut);
-  const data = await page.evaluate(() => {
-    const selector =
-      '#WebPartWPQ2 > div.ms-rtestate-field > table > tbody:nth-child(1) > tr';
-    const tds = Array.from(document.querySelectorAll(selector));
-    return tds.map(td => {
-      const tdTrimed = td.textContent.trim();
-      const tdCleaned = tdTrimed.replace(/\s+/g, ' ').split(/(\d+)/);
-      const regionalData = {
-        region: tdCleaned[0],
-        cases: tdCleaned[1]
-      };
-      return regionalData;
+  const event = await got(url);
+  const eventDom = new JSDOM(event.body.toString()).window.document;
+  const confirmed = await eventDom.querySelector(xPaths.confirmed).textContent;
+  const recovered = eventDom.querySelector(xPaths.recovered).textContent[0];
+  const deaths = eventDom.querySelector(xPaths.deaths).textContent[1];
+  const negative = eventDom.querySelector(xPaths.negative).textContent;
+  const date = eventDom.querySelector(xPaths.date).textContent;
+  const regionTable = eventDom.querySelectorAll('tr');
+  let regionalData = [];
+  regionTable.forEach(event => {
+    let region = event.querySelector('.ms-rteTableFirstCol-6');
+    let cases = event.querySelector('.ms-rteTableOddCol-6');
+    if (region === null) return;
+    regionalData.push({
+      region: region.textContent.trim(),
+      cases: cases.textContent.trim()
     });
   });
-  data.splice(0, 1);
-  const status = [
+
+  const data = [
     {
       confirmed: parseInt(confirmed),
       recovered: parseInt(recovered),
       deaths: parseInt(deaths),
       negative: parseInt(negative),
-      updated_at: date
+      last_updated: parsDate(date)
     },
-    [...data]
+    [...merge(regionalData, coordinates)]
   ];
 
-  await browser.close();
-  db.update('5e7a0e76ed7c2e1a4460268a', status);
+  client.set('data', JSON.stringify(data), function(err) {
+    if (err) {
+      throw err;
+    }
+  });
 };
 
 module.exports.scrapeData = scrapeData;
