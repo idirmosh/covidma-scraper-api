@@ -29,7 +29,10 @@ app.get('/api/:region', cors(), async (req, res) => {
       const regions = JSON.parse(value)[1];
       let matchedRegion;
       regions.map(reg =>
-        reg.regionCode === regionCode ? (matchedRegion = reg) : null
+        reg.regionCode === regionCode ||
+        reg.regionCode.toLowerCase() === regionCode.toLowerCase()
+          ? (matchedRegion = reg)
+          : null
       );
       res.json(matchedRegion ? matchedRegion : { message: 'not found' });
     }
@@ -39,6 +42,6 @@ app.get('/api/:region', cors(), async (req, res) => {
 app.listen(PORT, () => console.log(`Example app listening on PORT ${PORT}!`));
 
 cron.schedule('*/15 * * * *', () => {
-  console.log('running this task every 15 minute');
   scraper.scrapeData(SOURCE_URL);
+  console.log('running this task every 15 minute');
 });
