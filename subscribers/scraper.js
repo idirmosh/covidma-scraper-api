@@ -38,7 +38,6 @@ const scrapeData = async url => {
     [...merge(regionalData, coordinates)]
   ];
 
-  console.log(data);
   client.set('data', JSON.stringify(data), function(err) {
     if (err) {
       throw err;
