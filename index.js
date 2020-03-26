@@ -47,4 +47,3 @@ cron.schedule('*/15 * * * *', () => {
   console.log('running this task every 15 minute');
   scraper.scrapeData(SOURCE_URL);
 });
-scraper.scrapeData(SOURCE_URL);
