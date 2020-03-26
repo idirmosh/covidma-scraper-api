@@ -10,10 +10,13 @@ const scrapeData = async url => {
   const eventDom = new JSDOM(event.body.toString()).window.document;
   const confirmed = await eventDom.querySelector(xPaths.confirmed).textContent;
   const recovered = eventDom.querySelector(xPaths.recovered).textContent[0];
-  const deaths = eventDom.querySelector(xPaths.deaths).textContent[1];
+  const deaths =
+    eventDom.querySelector(xPaths.deaths).textContent[1] +
+    eventDom.querySelector(xPaths.deaths).textContent[2];
   const negative = eventDom.querySelector(xPaths.negative).textContent;
   const date = eventDom.querySelector(xPaths.date).textContent;
   const regionTable = eventDom.querySelectorAll('tr');
+  console.log(deaths);
   let regionalData = [];
   regionTable.forEach(event => {
     let region = event.querySelector('.ms-rteTableFirstCol-6');
