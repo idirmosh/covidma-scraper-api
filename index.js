@@ -15,7 +15,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Endpoints
 app.get('/api', cors(), async (req, res) => {
-  res.render('index', { title: 'title' });
   client.get('data', (err, value) => {
     if (err) throw err;
     else res.json(JSON.parse(value));
@@ -35,7 +34,6 @@ app.get('/api/:region', cors(), async (req, res) => {
           ? (matchedRegion = reg)
           : null
       );
-
       matchedRegion
         ? res.status(200).json(matchedRegion)
         : res.status(404).send({ error: 'Not Found!' });
@@ -46,6 +44,6 @@ app.get('/api/:region', cors(), async (req, res) => {
 app.listen(PORT, () => console.log(`Example app listening on PORT ${PORT}!`));
 
 cron.schedule('*/15 * * * *', () => {
-  scraper.scrapeData(SOURCE_URL);
   console.log('running this task every 15 minute');
+  scraper.scrapeData(SOURCE_URL);
 });
