@@ -24,10 +24,9 @@ const scrapeData = async url => {
     if (region === null) return;
     regionalData.push({
       region: region.textContent.trim(),
-      cases: cases.textContent.trim()
+      cases: parseInt(cases.textContent.replace(/\u200B/g, ''))
     });
   });
-
   const data = [
     {
       confirmed: parseInt(confirmed),
@@ -39,6 +38,7 @@ const scrapeData = async url => {
     [...merge(regionalData, coordinates)]
   ];
 
+  console.log(data);
   client.set('data', JSON.stringify(data), function(err) {
     if (err) {
       throw err;
