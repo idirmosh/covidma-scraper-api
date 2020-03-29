@@ -1,5 +1,4 @@
 const jsdom = require('jsdom');
-
 const got = require('got');
 const UserAgent = require('user-agents');
 const { JSDOM } = jsdom;
@@ -14,24 +13,25 @@ const scrapeData = async url => {
       headers: { 'User-Agent': userAgent }
     });
     const eventDom = new JSDOM(event.body.toString()).window.document;
-    const confirmed = eventDom.querySelector(xPaths.confirmed).textContent;
-    const recovered = eventDom.querySelector(xPaths.recovered).textContent;
-    const deaths = eventDom.querySelector(xPaths.deaths).textContent.split('');
+    const getTextContent = (xPathQuery) => eventDom.querySelector(xPathQuery).textContent;
+    const confirmed = getTextContent(xPaths.confirmed);
+    const recovered = getTextContent(xPaths.recovered); // TODO remove/or use this unused variable
+    const deaths = getTextContent(xPaths.deaths).split('');
     const a = deaths[0] + deaths[1];
     const d = deaths[2] + deaths[3];
-    const negative = eventDom.querySelector(xPaths.negative).textContent;
-    const date = eventDom.querySelector(xPaths.date).textContent;
+    const negative = getTextContent(xPaths.negative);
+    const date = getTextContent(xPaths.date);
     const regionTable = eventDom.querySelectorAll('tr');
-    let regionalData = [];
-    regionTable.forEach(event => {
-      let region = event.querySelector('.ms-rteTableFirstCol-6');
-      let cases = event.querySelector('.ms-rteTableOddCol-6');
-      if (region === null) return;
-      regionalData.push({
+    const regionalData = regionTable.map(event => {
+      const region = event.querySelector('.ms-rteTableFirstCol-6');
+      const cases = event.querySelector('.ms-rteTableOddCol-6');
+      if (!region) return null;
+      return ({
         region: region.textContent.trim(),
         cases: parseInt(cases.textContent.replace(/\u200B/g, ''))
       });
-    });
+    }).filter(o => o); // Keep only not null results;
+
     const data = [
       {
         confirmed: parseInt(confirmed),
