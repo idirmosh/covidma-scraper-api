@@ -13,26 +13,6 @@ const scrapeData = async url => {
       headers: { 'User-Agent': userAgent }
     });
     const eventDom = new JSDOM(event.body.toString()).window.document;
-<<<<<<< HEAD
-    const getTextContent = (xPathQuery) => eventDom.querySelector(xPathQuery).textContent;
-    const confirmed = getTextContent(xPaths.confirmed);
-    const recovered = getTextContent(xPaths.recovered); // TODO remove/or use this unused variable
-    const deaths = getTextContent(xPaths.deaths).split('');
-    const a = deaths[0] + deaths[1];
-    const d = deaths[2] + deaths[3];
-    const negative = getTextContent(xPaths.negative);
-    const date = getTextContent(xPaths.date);
-    const regionTable = eventDom.querySelectorAll('tr');
-    const regionalData = regionTable.map(event => {
-      const region = event.querySelector('.ms-rteTableFirstCol-6');
-      const cases = event.querySelector('.ms-rteTableOddCol-6');
-      if (!region) return null;
-      return ({
-        region: region.textContent.trim(),
-        cases: parseInt(cases.textContent.replace(/\u200B/g, ''))
-      });
-    }).filter(o => o); // Keep only not null results;
-=======
     const getTextContent = xPathQuery =>
       eventDom.querySelector(xPathQuery).textContent;
     const confirmed = getTextContent(xPaths.confirmed);
@@ -54,7 +34,6 @@ const scrapeData = async url => {
         };
       })
       .filter(o => o); // Keep only not null results;
->>>>>>> Fix #7
 
     const data = [
       {
