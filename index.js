@@ -27,16 +27,10 @@ app.get('/api/:region', cors(), async (req, res) => {
     if (err) throw err;
     else {
       const regions = JSON.parse(value)[1];
-      let matchedRegion;
-      regions.map(reg =>
-        reg.regionCode === regionCode ||
-        reg.regionCode.toLowerCase() === regionCode.toLowerCase()
-          ? (matchedRegion = reg)
-          : null
-      );
-      matchedRegion
+      const matchedRegion = regions.filter(reg => reg.regionCode.toUpperCase() === regionCode.toUpperCase())[0];
+      matchedRegion 
         ? res.status(200).json(matchedRegion)
-        : res.status(404).send({ error: 'Not Found!' });
+        : res.status(404).send({ error: 'Not Found!' }); // in case matchedRegion is undefined
     }
   });
 });
